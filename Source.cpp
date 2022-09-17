@@ -3,27 +3,27 @@
 #include <string>
 #include <algorithm>
 #include <fstream>
+#include <conio.h>
 using namespace std;
 
 class Fabric
 {
 public:
-	virtual void rimsOnWheels() = 0;
-	virtual void Queue() = 0;
+	virtual void EnterData() = 0;
 	virtual void Save() = 0;
 	virtual void Read() = 0;
-	virtual void Search() = 0;
+	virtual void SearchName() = 0;
+	virtual void SearchDate() = 0;
+	virtual void SearchTage() = 0;
 	virtual void Print() = 0;
 	virtual void Enter() = 0;
 
 };
 
-
-
-class BMW : public Fabric
+class CreateDe : public Fabric
 {
-
 public:
+
 	vector<string> queue;
 	struct delo
 	{
@@ -34,11 +34,9 @@ public:
 	delo D;
 	vector<delo>delo;
 
-	
-
 	void Enter()override
 	{
-		rimsOnWheels();
+		EnterData();
 	}
 
 	void Print() override
@@ -51,26 +49,19 @@ public:
 			cout << "Tage: " << delo[i].tage << "\n";
 		}
 	}
-	void rimsOnWheels() override
+
+	void EnterData() override
 	{
 		cout << "Enter name business\n";
-		getline(cin,D.name);
+		getline(cin, D.name);
 		cout << "Enter date business\n";
 		getline(cin, D.date);
 		cout << "Enter tage business\n";
 		getline(cin, D.tage);
 		delo.push_back(D);
-		
-	}
-	void Queue() override
-	{
-		/*for (int i = 0; i < delo.size(); i++)
-		{*/
-			sort(delo[0].date.begin(), delo[delo.size()+1].date.end());
 
-		/*}*/
-		
 	}
+
 	void Save() override
 	{
 		ofstream outfile("TestDelo.txt");
@@ -94,16 +85,16 @@ public:
 			{
 				getline(outfile, s);
 
-				cout << s<<"\n";
-				
+				cout << s << "\n";
+
 			}
 		}
 		outfile.close();
 		cout << "\n";
 	}
-	
-	void Search() override
-	{	
+
+	void SearchName() override
+	{
 		string a;
 		cout << "Enter search name:\n";
 		getline(cin, a);
@@ -123,94 +114,209 @@ public:
 		}
 	}
 
-};
-
-
-class Auto
-{
-public:
-	virtual BMW* createBMW() = 0;
-	
-};
-
-
-class AutoFactory : public Auto
-{
-public:
-	BMW* createBMW()
+	void SearchDate() override
 	{
-		return new BMW;
+		string a;
+		cout << "Enter search date:\n";
+		getline(cin, a);
+		bool b = false;
+		for (int i = 0; i < delo.size(); i++)
+		{
+
+			if (!delo[i].date.find(a))
+			{
+				cout << i + 1 << "\t" << delo[i].date << "\n";
+				b = true;
+			}
+		}
+		if (b == false)
+		{
+			cout << "Ne nashlos'\n";
+		}
 	}
 
+	void SearchTage() override
+	{
+		string a;
+		cout << "Enter search tage:\n";
+		getline(cin, a);
+		bool b = false;
+		for (int i = 0; i < delo.size(); i++)
+		{
+
+			if (!delo[i].tage.find(a))
+			{
+				cout << i + 1 << "\t" << delo[i].tage << "\n";
+				b = true;
+			}
+		}
+		if (b == false)
+		{
+			cout << "Ne nashlos'\n";
+		}
+	}
+
+};
+
+class DeloAbs
+{
+public:
+	virtual CreateDe* createDATA() = 0;
+};
+
+class DeloFactory : public DeloAbs
+{
+public:
+	CreateDe* createDATA()
+	{
+		return new CreateDe;
+	}
 };
 
 class Create
 {
 public:
-	vector<BMW*> BMW;
-	
+	vector<CreateDe*> d;
+
 	~Create()
 	{
-		for (int i = 0; i < BMW.size(); i++) delete BMW[i];
+		for (int i = 0; i < d.size(); i++) delete d[i];
 
 	}
+
 	void Enter()
 	{
-		for (int i = 0; i < BMW.size(); i++)  BMW[i]->Enter();
+		for (int i = 0; i < d.size(); i++)  d[i]->Enter();
 	}
+
 	void info()
 	{
-		for (int i = 0; i < BMW.size(); i++)  BMW[i]->Print();
+		for (int i = 0; i < d.size(); i++)  d[i]->Print();
 		cout << "\n";
-		
 	}
 
 	void Sav()
 	{
-		for (int i = 0; i < BMW.size(); i++)  BMW[i]->Save();
-	}
-	void Reader()
-	{
-		for (int i = 0; i < BMW.size(); i++)  BMW[i]->Read();
+		for (int i = 0; i < d.size(); i++)  d[i]->Save();
 	}
 
-	void Searcher()
+	void Reader()
 	{
-		for (int i = 0; i < BMW.size(); i++)  BMW[i]->Search();
+		for (int i = 0; i < d.size(); i++)  d[i]->Read();
+	}
+
+	void SearcherName()
+	{
+		for (int i = 0; i < d.size(); i++)  d[i]->SearchName();
+	}
+
+	void SearcherDate()
+	{
+		for (int i = 0; i < d.size(); i++)  d[i]->SearchDate();
+	}
+
+	void SearcherTage()
+	{
+		for (int i = 0; i < d.size(); i++)  d[i]->SearchTage();
 	}
 
 };
 
-class NewAuto
+class NewData
 {
 public:
-	Create* createAuto(AutoFactory& factory)
+	Create* createDelo(DeloFactory& factory)
 	{
 		Create* c = new Create;
-		c->BMW.push_back(factory.createBMW());
+		c->d.push_back(factory.createDATA());
 		return c;
 	}
-
 };
 
 int main()
 {
-	NewAuto NewAuto2;
-	AutoFactory BMW_factory;
+	NewData NewD;
+	DeloFactory DELO_Factory;
 
-	Create* BMW = NewAuto2.createAuto(BMW_factory);
-	
-	BMW->Enter();
-	/*NewAuto2.createAuto(BMW_factory);*/
-	BMW->info();
-	BMW->Enter();
-	BMW->info();
-	BMW->Enter();
-	BMW->info();
-	
-	BMW->Sav();
-	BMW->Reader();
-	BMW->Searcher();
+	Create* DELO = NewD.createDelo(DELO_Factory);
 
-	
+	char vvod;
+	do
+	{
+		system("cls");
+		cout << "1 - CreateDelo\n";
+		cout << "2 - SearchName\n";
+		cout << "3 - SearchDate\n";
+		cout << "4 - SearchTage\n";
+		cout << "5 - info\n";
+		cout << "6 - SaveToFile\n";
+		cout << "7 - ReadFile\n";
+		cout << "Exit - Esc\n";
+		vvod = _getch();
+		switch (vvod)
+		{
+		case'1':
+		{
+			re1:DELO->Enter();
+			char vvod;
+			do
+			{
+				system("cls");
+				cout << "1 - Add delo\n";
+				cout << "2 - Exit\n";
+				vvod = _getch();
+				switch (vvod)
+				{
+				case'1':
+				{
+					goto re1;
+				}
+				case'2':
+				{
+					vvod = 27;
+				}
+				}
+			} while (vvod != 27);
+			system("pause");
+			break;
+		}
+		case'2':
+		{
+			DELO->SearcherName();
+			system("pause");
+			break;
+		}
+		case'3':
+		{
+			DELO->SearcherDate();
+			system("pause");
+			break;
+		}
+		case'4':
+		{
+			DELO->SearcherTage();
+			system("pause");
+			break;
+		}
+		case'5':
+		{
+			DELO->info();
+			system("pause");
+			break;
+		}
+		case'6':
+		{
+			DELO->Sav();
+			system("pause");
+			break;
+		}
+		case'7':
+		{
+			DELO->Reader();
+			system("pause");
+			break;
+		}
+		}
+	} while (vvod != 27);
+
 }
